@@ -9,6 +9,8 @@ Launched via `run_rgcn_fb15k.slurm`: `python -u code/train.py --settings setting
 | Encoder | `Name=gcn_basis` | R-GCN with basis decomposition (5 bases, 2 layers, 500-dim, dropout 0.8, etc.) |
 | Decoder | `Name=bilinear-diag` | Diagonal bilinear scorer (DistMult-style; see equations below). |
 
+**Slurm job ID:** 7099945
+
 ### Encoder (`gcn_basis`) and “5 bases”
 
 Settings (`settings/gcn_basis.exp`): `NumberOfBasisFunctions=5`, `NumberOfLayers=2`, `InternalEncoderDimension=500`, `DropoutKeepProbability=0.8`, `UseInputTransform=Yes`, `UseOutputTransform=No`. Implementation: `code/encoders/message_gcns/gcn_basis.py` (`BasisGcn`).
