@@ -98,11 +98,24 @@ So: **`gcn_basis` vs `gcn_block`** changes the **graph encoder**. **`distmult` v
 
 **Idea in words:** For each triple $(s,r,o)$, the encoder still outputs three vectors—one for subject, one for relation, one for object. The Complex decoder **splits each of those vectors in half**: the first half is treated as the **real part**, the second half as the **imaginary part** of a complex embedding (per dimension). The score is then a **single real number** built from **four** three-way products (one per “complex interaction pattern”). That is the standard **ComplEx**-style scoring function: it can represent **asymmetric** patterns (e.g. relation vs inverse) more easily than a single real triple product.
 
-Let $d$ be `CodeDimension` (must be **even**). For each entity/relation vector, write real and imaginary parts in $\mathbb{R}^{d/2}$ as $\mathbf{e}_s^{\Re}, \mathbf{e}_s^{\Im}$, $\mathbf{r}^{\Re}, \mathbf{r}^{\Im}$, $\mathbf{e}_o^{\Re}, \mathbf{e}_o^{\Im}$. The **energy (logit)** is (one line so Markdown previews do not drop `+` or line breaks):
+Let $d$ be `CodeDimension` (must be **even**). For each entity/relation vector, write real and imaginary parts in $\mathbb{R}^{d/2}$ as $\mathbf{e}_s^{\Re}, \mathbf{e}_s^{\Im}$, $\mathbf{r}^{\Re}, \mathbf{r}^{\Im}$, $\mathbf{e}_o^{\Re}, \mathbf{e}_o^{\Im}$. The **energy (logit)** is:
 
 $$
 f(s,r,o) = \sum_{k=1}^{d/2} \Bigl( [\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Re}]_k + [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Im}]_k + [\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Im}]_k - [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Re}]_k \Bigr).
 $$
+
+Do **not** split that sum across lines inside `$$` without `+` between products—broken previews often drop the plus signs. If you need `\begin{aligned}` (e.g. for a paper), use **exactly** this (note `+` before each continuation line; line break only after `\\`):
+
+```latex
+\begin{aligned}
+f(s,r,o) &= \sum_{k=1}^{d/2} \Bigl(
+  [\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Re}]_k
+  + [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Im}]_k \\
+  &\quad + [\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Im}]_k
+  - [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Re}]_k
+\Bigr).
+\end{aligned}
+```
 
 **Readable form (same four terms; use if math does not render):** for each dimension $k$,
 
