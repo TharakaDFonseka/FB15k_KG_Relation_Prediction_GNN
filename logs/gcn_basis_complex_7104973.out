@@ -1,0 +1,10 @@
+{'Decoder': {'RegularizationParameter': '0.01', 'Name': 'complex'}, 'Evaluation': {'Metric': 'MRR'}, 'Encoder': {'Name': 'gcn_basis', 'InternalEncoderDimension': '500', 'RandomInput': 'No', 'StoreEdgeData': 'No', 'PartiallyRandomInput': 'No', 'UseInputTransform': 'Yes', 'NumberOfBasisFunctions': '5', 'Concatenation': 'No', 'SkipConnections': 'None', 'UseOutputTransform': 'No', 'DiagonalCoefficients': 'No', 'NumberOfLayers': '2', 'DropoutKeepProbability': '0.8', 'AddDiagonal': 'No'}, 'General': {'NegativeSampleRate': '10', 'GraphSplitSize': '0.5', 'ExperimentName': 'models/GcnBasisComplEx', 'GraphBatchSize': '30000'}, 'Shared': {'CodeDimension': '500'}, 'Optimizer': {'ReportTrainLossEvery': '100', 'Algorithm': {'learning_rate': '0.01', 'Name': 'Adam'}, 'EarlyStopping': {'CheckEvery': '2000', 'BurninPhaseDuration': '6000'}, 'MaxGradientNorm': '1'}}
+483142
+[<tf.Tensor 'graph_edges:0' shape=(?, 3) dtype=int32>, <tf.Tensor 'Placeholder_1:0' shape=(?, 3) dtype=int32>, <tf.Tensor 'Placeholder:0' shape=(?,) dtype=float32>]
+SampleTransformer
+GradientClipping
+Adam
+TrainLossReporter
+EarlyStopper
+ModelSaver
+Initial loss: 31.062943

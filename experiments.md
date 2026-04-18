@@ -62,26 +62,34 @@ $$
 
 ## Run-2
 
-This section summarizes **the four experiment recipes** in `settings/` and explains the **`complex`** decoder in plain language. Use it when you want to compare encoders and decoders without digging through code first.
+Run-2 trains **basis + ComplEx**: **`gcn_basis`** encoder (**5** bases, same family as Run-1) with the **`complex`** decoder. This is **`settings/gcn_basis_complex.exp`** — **not** `complex.exp`, which pairs the ComplEx decoder with a shallow **`embedding`** encoder only.
 
-### Four `.exp` files at a glance
+| Part | Setting | Meaning |
+|------|---------|--------|
+| Encoder | `Name=gcn_basis`, `NumberOfBasisFunctions=5`, … | Same R-GCN basis stack as Run-1 (`BasisGcn`). |
+| Decoder | `Name=complex` | ComplEx-style scoring (`code/decoders/complex.py`). |
+
+**Launch (Slurm):** `run_gcn_basis_complex.slurm` — same resource/layout idea as `run_rgcn_fb15k.slurm`, but `cd` to this repo and:
+
+```text
+python -u code/train.py --settings settings/gcn_basis_complex.exp --dataset FB15k
+```
+
+**Slurm job ID:** __________________ (fill in after `sbatch`)
+
+### Other `.exp` recipes (reference)
 
 Each file is one **full training recipe** (encoder + decoder + dimensions + optimizer + batch settings). Changing file changes **how entity/relation vectors are produced** and/or **how a triple is scored**.
 
 | File | Encoder | Decoder | In one sentence |
 |------|---------|---------|-----------------|
-| **`gcn_basis.exp`** | `gcn_basis` → **`BasisGcn`** (R-GCN, basis decomposition, **5** bases) | `bilinear-diag` | Graph convolutions with **few shared bases** + DistMult-style score. |
-| **`gcn_block.exp`** | `gcn_basis` + **`Concatenation=Yes`** → **`ConcatGcn`** (**100** bases; README ties this to the paper’s block-style setup) | `bilinear-diag` | Stronger / larger basis-style encoder + **same** DistMult-style score as `gcn_basis.exp`. |
-| **`distmult.exp`** | `embedding` (lookup table, **no** GCN) | `bilinear-diag` | **Shallow** embeddings only + DistMult-style score—classic baseline. |
-| **`complex.exp`** | `embedding` (same style as `distmult.exp`) | `complex` | **Same shallow encoder** as DistMult, but scoring uses **ComplEx** (complex-valued halves), not the triple product of three real vectors. |
+| **`gcn_basis_complex.exp`** | `gcn_basis` → **`BasisGcn`** (**5** bases) | `complex` | **This Run-2 recipe** — R-GCN basis encoder + ComplEx head. |
+| **`gcn_basis.exp`** | `gcn_basis` → **`BasisGcn`** (**5** bases) | `bilinear-diag` | Same encoder as Run-1 / basis+ComplEx, DistMult-style score. |
+| **`gcn_block.exp`** | `gcn_basis` + **`ConcatGcn`** (**100** bases) | `bilinear-diag` | Larger / concat basis encoder + DistMult-style score. |
+| **`distmult.exp`** | `embedding` (no GCN) | `bilinear-diag` | Shallow embeddings + DistMult. |
+| **`complex.exp`** | `embedding` (no GCN) | `complex` | Shallow embeddings + ComplEx — **decoder only** matches Run-2; **encoder differs** from Run-2. |
 
-So: **`gcn_basis` vs `gcn_block`** mainly changes the **graph encoder** (and basis/concat settings). **`distmult` vs `complex`** keeps the **encoder** the same and swaps only the **decoder**. **`distmult` vs `gcn_*`** keeps the **decoder type** similar (both use `bilinear-diag` for the GCN runs) but adds or removes the **R-GCN encoder**.
-
-Example command (same pattern as Run-1, swap the settings file):
-
-```text
-python -u code/train.py --settings settings/complex.exp --dataset FB15k
-```
+So: **`gcn_basis` vs `gcn_block`** changes the **graph encoder**. **`distmult` vs `complex`** swaps the **decoder** with a fixed **embedding** encoder. **Run-2** fixes **basis encoder + ComplEx decoder** in one file (`gcn_basis_complex.exp`).
 
 ### The Complex decoder (what it does and where it lives)
 
