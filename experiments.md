@@ -59,3 +59,47 @@ $$
 $$
 
 (batch means over the minibatch in code).
+
+## Run-2
+
+This section summarizes **the four experiment recipes** in `settings/` and explains the **`complex`** decoder in plain language. Use it when you want to compare encoders and decoders without digging through code first.
+
+### Four `.exp` files at a glance
+
+Each file is one **full training recipe** (encoder + decoder + dimensions + optimizer + batch settings). Changing file changes **how entity/relation vectors are produced** and/or **how a triple is scored**.
+
+| File | Encoder | Decoder | In one sentence |
+|------|---------|---------|-----------------|
+| **`gcn_basis.exp`** | `gcn_basis` → **`BasisGcn`** (R-GCN, basis decomposition, **5** bases) | `bilinear-diag` | Graph convolutions with **few shared bases** + DistMult-style score. |
+| **`gcn_block.exp`** | `gcn_basis` + **`Concatenation=Yes`** → **`ConcatGcn`** (**100** bases; README ties this to the paper’s block-style setup) | `bilinear-diag` | Stronger / larger basis-style encoder + **same** DistMult-style score as `gcn_basis.exp`. |
+| **`distmult.exp`** | `embedding` (lookup table, **no** GCN) | `bilinear-diag` | **Shallow** embeddings only + DistMult-style score—classic baseline. |
+| **`complex.exp`** | `embedding` (same style as `distmult.exp`) | `complex` | **Same shallow encoder** as DistMult, but scoring uses **ComplEx** (complex-valued halves), not the triple product of three real vectors. |
+
+So: **`gcn_basis` vs `gcn_block`** mainly changes the **graph encoder** (and basis/concat settings). **`distmult` vs `complex`** keeps the **encoder** the same and swaps only the **decoder**. **`distmult` vs `gcn_*`** keeps the **decoder type** similar (both use `bilinear-diag` for the GCN runs) but adds or removes the **R-GCN encoder**.
+
+Example command (same pattern as Run-1, swap the settings file):
+
+```text
+python -u code/train.py --settings settings/complex.exp --dataset FB15k
+```
+
+### The Complex decoder (what it does and where it lives)
+
+**Name:** In settings, `Name=complex`. **Code:** `code/decoders/complex.py`, class `Complex`. **Not** a “distance model”: the name refers to **complex numbers** (real + imaginary parts), not “distance” in space.
+
+**Idea in words:** For each triple $(s,r,o)$, the encoder still outputs three vectors—one for subject, one for relation, one for object. The Complex decoder **splits each of those vectors in half**: the first half is treated as the **real part**, the second half as the **imaginary part** of a complex embedding (per dimension). The score is then a **single real number** built from **four** three-way products (one per “complex interaction pattern”). That is the standard **ComplEx**-style scoring function: it can represent **asymmetric** patterns (e.g. relation vs inverse) more easily than a single real triple product.
+
+Let $d$ be `CodeDimension` (must be **even**). For each entity/relation vector, write real and imaginary parts in $\mathbb{R}^{d/2}$ as $\mathbf{e}_s^{\Re}, \mathbf{e}_s^{\Im}$, $\mathbf{r}^{\Re}, \mathbf{r}^{\Im}$, $\mathbf{e}_o^{\Re}, \mathbf{e}_o^{\Im}$. The **energy (logit)** is
+
+$$
+f(s,r,o) = \sum_{k=1}^{d/2} \Bigl(
+[\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Re}]_k
++ [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Im}]_k
++ [\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Im}]_k
+- [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Re}]_k
+\Bigr).
+$$
+
+This is the **real part** of the usual complex trilinear score $\Re\!\sum_k e_s^{(k)} r^{(k)} \overline{e_o^{(k)}}$ with complex units. **Predictions** still use $\hat{p}(s,r,o)=\sigma(f(s,r,o))$, and training uses the same **weighted cross-entropy on logits** pattern as the other decoders.
+
+**Contrast with `bilinear-diag`:** There you multiply **three real vectors** per dimension and sum: $f = \sum_k h_s^k r^k h_o^k$. Here you still sum over dimensions, but each dimension uses **four** terms mixing real and imaginary parts—so it is **not** the same as DistMult unless you collapse to the purely real case.
