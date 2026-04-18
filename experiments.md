@@ -102,13 +102,24 @@ So: **`gcn_basis` vs `gcn_block`** changes the **graph encoder**. **`distmult` v
 Let $d$ be `CodeDimension` (must be **even**). For each entity/relation vector, write real and imaginary parts in $\mathbb{R}^{d/2}$ as $\mathbf{e}_s^{\Re}, \mathbf{e}_s^{\Im}$, $\mathbf{r}^{\Re}, \mathbf{r}^{\Im}$, $\mathbf{e}_o^{\Re}, \mathbf{e}_o^{\Im}$. The **energy (logit)** is
 
 $$
-f(s,r,o) = \sum_{k=1}^{d/2} \Bigl(
+\begin{aligned}
+f(s,r,o) &= \sum_{k=1}^{d/2} \Bigl(
 [\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Re}]_k
-+ [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Im}]_k
-+ [\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Im}]_k
++ [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Re}]_k [\mathbf{e}_o^{\Im}]_k \\
+&\quad + [\mathbf{e}_s^{\Re}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Im}]_k
 - [\mathbf{e}_s^{\Im}]_k [\mathbf{r}^{\Im}]_k [\mathbf{e}_o^{\Re}]_k
 \Bigr).
+\end{aligned}
 $$
+
+**Readable form (same four terms; use if math does not render):** for each dimension $k$,
+
+`(+)` $(e_s^{\mathrm{Re}})_k (r^{\mathrm{Re}})_k (e_o^{\mathrm{Re}})_k$  
+`(+)` $(e_s^{\mathrm{Im}})_k (r^{\mathrm{Re}})_k (e_o^{\mathrm{Im}})_k$  
+`(+)` $(e_s^{\mathrm{Re}})_k (r^{\mathrm{Im}})_k (e_o^{\mathrm{Im}})_k$  
+`(−)` $(e_s^{\mathrm{Im}})_k (r^{\mathrm{Im}})_k (e_o^{\mathrm{Re}})_k$  
+
+sum all four, then sum over $k = 1,\ldots,d/2$.
 
 This is the **real part** of the usual complex trilinear score $\Re\!\sum_k e_s^{(k)} r^{(k)} \overline{e_o^{(k)}}$ with complex units. **Predictions** still use $\hat{p}(s,r,o)=\sigma(f(s,r,o))$, and training uses the same **weighted cross-entropy on logits** pattern as the other decoders.
 
