@@ -1,6 +1,6 @@
 # Experiments
 
-## run1
+## Run-1
 
 Launched via `run_rgcn_fb15k.slurm`: `python -u code/train.py --settings settings/gcn_basis.exp --dataset FB15k`.
 
