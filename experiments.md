@@ -9,6 +9,27 @@ Launched via `run_rgcn_fb15k.slurm`: `python -u code/train.py --settings setting
 | Encoder | `Name=gcn_basis` | R-GCN with basis decomposition (5 bases, 2 layers, 500-dim, dropout 0.8, etc.) |
 | Decoder | `Name=bilinear-diag` | Diagonal bilinear scorer (DistMult-style; see equations below). |
 
+### Encoder (`gcn_basis`) and “5 bases”
+
+Settings (`settings/gcn_basis.exp`): `NumberOfBasisFunctions=5`, `NumberOfLayers=2`, `InternalEncoderDimension=500`, `DropoutKeepProbability=0.8`, `UseInputTransform=Yes`, `UseOutputTransform=No`. Implementation: `code/encoders/message_gcns/gcn_basis.py` (`BasisGcn`).
+
+A full R-GCN could learn a **separate** weight matrix for every relation $r$. **Basis decomposition** instead shares a small set of **basis transforms** and learns, for each relation, **mixing coefficients** over those bases. Here the number of bases is $B = 5$ (`NumberOfBasisFunctions`).
+
+Let $b \in \{1,\ldots,B\}$ index the bases. Conceptually, the relation-specific linear map used along an edge of type $r$ is a **linear combination** of $B$ shared maps rather than one unconstrained matrix per $r$:
+
+$$
+\mathbf{W}_r \;\approx\; \sum_{b=1}^{B} c_{r,b}\, \mathbf{V}_b
+$$
+
+The implementation keeps **separate** coefficient rows for forward- and backward-directed message passes (`C_forward`, `C_backward` in code), so for each direction,
+
+$$
+\mathbf{W}_r^{\rightarrow} = \sum_{b=1}^{B} c_{r,b}^{\rightarrow}\, \mathbf{V}_b^{\rightarrow}, \qquad
+\mathbf{W}_r^{\leftarrow} = \sum_{b=1}^{B} c_{r,b}^{\leftarrow}\, \mathbf{V}_b^{\leftarrow}.
+$$
+
+Messages aggregate terms from the basis-transformed features; per edge type $r$, those terms are **weighted by** the corresponding $B$-vector $c_r$ (embedding lookup on relation id), then **summed over** $b=1,\ldots,B$—so **“5 bases”** means **five shared building blocks** that all relations reuse, with **five learned scalars per relation (per direction)** controlling the mix. This reduces parameters versus a full per-relation matrix at the cost of a fixed rank / shared structure.
+
 ### Decoder (`bilinear-diag`) equations
 
 The decoder (`code/decoders/bilinear_diag.py`) maps each triple $(s, r, o)$ to embeddings $\mathbf{h}_s, \mathbf{r}_r, \mathbf{h}_o \in \mathbb{R}^d$ (from the encoder’s subject, relation, and object code matrices) and uses a **diagonal** interaction: score is the dot product after elementwise scaling by $\mathbf{r}_r$.
