@@ -12,8 +12,7 @@
   np_resource = np.dtype([("resource", np.ubyte, 1)])
 WARNING (theano.configdefaults): install mkl with `conda install mkl-service`: No module named 'mkl'
 WARNING (theano.tensor.blas): Using NumPy C-API based implementation for BLAS functions.
-2026-04-18 01:58:40.703301: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 AVX512F FMA
+2026-04-18 02:21:18.754338: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 AVX512F FMA
 WARNING:tensorflow:From /scratch/gpfs/JHA/tf8712/CONDA/envs/rgcn_tf1/lib/python3.5/site-packages/tensorflow/python/util/tf_should_use.py:107: initialize_all_variables (from tensorflow.python.ops.variables) is deprecated and will be removed after 2017-03-02.
 Instructions for updating:
 Use `tf.global_variables_initializer` instead.
-[2026-04-18T02:19:44.553] error: *** JOB 7104973 ON della-h16n5 CANCELLED AT 2026-04-18T02:19:44 DUE to SIGNAL Terminated ***

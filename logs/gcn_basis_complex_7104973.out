@@ -8,3 +8,4 @@ TrainLossReporter
 EarlyStopper
 ModelSaver
 Initial loss: 31.062943
+Average train loss for iteration 1-100: 16.31695441454649

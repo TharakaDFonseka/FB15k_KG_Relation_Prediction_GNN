@@ -4,7 +4,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=00:50:00
+#SBATCH --time=30:00:00
 #SBATCH --partition=cpu
 #SBATCH --output=/scratch/gpfs/JHA/tf8712/GNN/FB15k_KG_Relation_Prediction_GNN/logs/gcn_basis_complex_%j.out
 #SBATCH --error=/scratch/gpfs/JHA/tf8712/GNN/FB15k_KG_Relation_Prediction_GNN/logs/gcn_basis_complex_%j.err

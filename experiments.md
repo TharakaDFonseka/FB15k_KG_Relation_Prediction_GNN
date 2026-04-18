@@ -77,7 +77,7 @@ Run-2 trains **basis + ComplEx**: **`gcn_basis`** encoder (**5** bases, same fam
 python -u code/train.py --settings settings/gcn_basis_complex.exp --dataset FB15k
 ```
 
-**Slurm job ID:** __________________ (fill in after `sbatch`)
+**Slurm job ID:** 7105346
 
 ### Other `.exp` recipes (reference)
 
