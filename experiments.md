@@ -129,3 +129,43 @@ sum all four, then sum over $k = 1,\ldots,d/2$.
 This is the **real part** of the usual complex trilinear score $\Re\!\sum_k e_s^{(k)} r^{(k)} \overline{e_o^{(k)}}$ with complex units. **Predictions** still use $\hat{p}(s,r,o)=\sigma(f(s,r,o))$, and training uses the same **weighted cross-entropy on logits** pattern as the other decoders.
 
 **Contrast with `bilinear-diag`:** There you multiply **three real vectors** per dimension and sum: $f = \sum_k h_s^k r^k h_o^k$. Here you still sum over dimensions, but each dimension uses **four** terms mixing real and imaginary parts—so it is **not** the same as DistMult unless you collapse to the purely real case.
+
+## Log review: jobs `7152017` and `7151966`
+
+These are additional reruns on **FB15k** (not FB15k-237), based on the launch scripts and printed settings in logs.
+
+| Job ID | Log file | Settings | Best checkpoint (validation) | Best validation metrics (Raw / Filtered) |
+|------|---------|---------|------------------------------|-------------------------------------------|
+| `7152017` | `logs/gcn_7152017.out` | `settings/gcn_basis.exp` (`gcn_basis` + `bilinear-diag`) | Iteration `12000` | MRR `0.126 / 0.200`, H@1 `0.063 / 0.126`, H@3 `0.131 / 0.216`, H@10 `0.253 / 0.346` |
+| `7151966` | `logs/gcn_basis_complex_7151966.out` | `settings/gcn_basis_complex.exp` (`gcn_basis` + `complex`) | Iteration `10000` | MRR `0.121 / 0.187`, H@1 `0.061 / 0.117`, H@3 `0.127 / 0.204`, H@10 `0.237 / 0.325` |
+
+Both runs end with early stopping:
+
+- `7152017`: stopped at iteration `14000`
+- `7151966`: stopped at iteration `12000`
+
+### Comparison to original paper tables (attached images)
+
+For **FB15k** (Table 4 in the paper image):
+
+- R-GCN: filtered MRR `0.651`, filtered H@10 `0.825`
+- R-GCN+: filtered MRR `0.696`, filtered H@10 `0.842`
+
+Compared to our best **validation** checkpoints:
+
+- `7152017` (`gcn_basis` + DistMult-style): filtered MRR `0.200`, filtered H@10 `0.346`
+- `7151966` (`gcn_basis` + ComplEx): filtered MRR `0.187`, filtered H@10 `0.325`
+
+For **FB15k-237** (Table 5 in the paper image), R-GCN filtered MRR is `0.248`. Our logs here are not directly that dataset; these two jobs are FB15k runs, so do not interpret them as FB15k-237 replication results.
+
+## Run-3
+
+### Log review: jobs `7231546`, `7250012`, and `7249935`
+
+From the printed settings at the top of each log, all three jobs use the `complex` decoder. The dataset is inferred from `len(train_triplets)` printed on line 2 (`483142` = FB15k, `272115` = FB15k-237).
+
+| Job ID | Dataset | Train triples | Encoder | Decoder |
+|------|---------|---------------|---------|---------|
+| `7231546` | `FB15k-237` | `272115` | `gcn_basis` (`NumberOfBasisFunctions=5`, `Concatenation=No`) | `complex` |
+| `7250012` | `FB15k` | `483142` | `gcn_basis` (`NumberOfBasisFunctions=100`, `Concatenation=Yes` -> `ConcatGcn` / block-style variant) | `complex` |
+| `7249935` | `FB15k-237` | `272115` | `gcn_basis` (`NumberOfBasisFunctions=100`, `Concatenation=Yes` -> `ConcatGcn` / block-style variant) | `complex` |
