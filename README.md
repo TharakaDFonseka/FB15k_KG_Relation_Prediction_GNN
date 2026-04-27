@@ -52,7 +52,7 @@ One likely reason is that the current settings (`5` bases for basis decompositio
 
 **Citation**
 
-Please cite our paper if you use this code in your own work:
+Please cite RGCN paper if you use this code in your own work:
 
 ```
 @inproceedings{schlichtkrull2018modeling,
