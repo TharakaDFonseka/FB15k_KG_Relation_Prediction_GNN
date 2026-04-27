@@ -169,3 +169,21 @@ From the printed settings at the top of each log, all three jobs use the `comple
 | `7231546` | `FB15k-237` | `272115` | `gcn_basis` (`NumberOfBasisFunctions=5`, `Concatenation=No`) | `complex` |
 | `7250012` | `FB15k` | `483142` | `gcn_basis` (`NumberOfBasisFunctions=100`, `Concatenation=Yes` -> `ConcatGcn` / block-style variant) | `complex` |
 | `7249935` | `FB15k-237` | `272115` | `gcn_basis` (`NumberOfBasisFunctions=100`, `Concatenation=Yes` -> `ConcatGcn` / block-style variant) | `complex` |
+
+### Reported results from Run-3
+
+Metrics are reported as: **MRR (raw), MRR (filtered), Hits@1, Hits@3, Hits@10**.
+
+#### Full FB15k
+
+| Model | Encoder | Decoder | MRR (raw) | MRR (filtered) | H@1 | H@3 | H@10 |
+|------|---------|---------|-----------|----------------|-----|-----|------|
+| `Ours_1` | 5-basis R-GCN | `complex` | 0.155 | 0.315 | 0.233 | 0.397 | 0.588 |
+| `Ours_2` | Block-diagonal R-GCN (`5x5`, 100 blocks) | `complex` | 0.228 | 0.437 | 0.327 | 0.479 | 0.653 |
+
+#### FB15k-237
+
+| Model | Encoder | Decoder | MRR (raw) | MRR (filtered) | H@1 | H@3 | H@10 |
+|------|---------|---------|-----------|----------------|-----|-----|------|
+| `Ours_1` | 5-basis R-GCN | `complex` | 0.099 | 0.153 | 0.087 | 0.164 | 0.285 |
+| `Ours_2` | Block-diagonal R-GCN (`5x5`, 100 blocks) | `complex` | 0.151 | 0.242 | 0.153 | 0.258 | 0.413 |
